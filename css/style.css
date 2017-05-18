@@ -1,0 +1,132 @@
+.bubble{
+    background-color: #F2F2F2;
+    border-radius: 5px;
+    box-shadow: 0 0 6px #B2B2B2;
+    padding: 15px 18px;
+    position: relative;
+    vertical-align: top;
+    float: left;   
+    margin: 18px 45px 0px 0px;
+    white-space: pre-wrap;
+}
+
+.bubble::before {
+    background-color: #F2F2F2;
+    content: "\00a0";
+    display: block;
+    height: 16px;
+    position: absolute;
+    top: -6px;
+    transform:             rotate( 119deg ) skew( -35deg );
+        -moz-transform:    rotate( 119deg ) skew( -35deg );
+        -ms-transform:     rotate( 119deg ) skew( -35deg );
+        -o-transform:      rotate( 119deg ) skew( -35deg );
+        -webkit-transform: rotate( 119deg ) skew( -35deg );
+    width:  20px;
+    box-shadow: -2px 2px 2px 0 rgba( 178, 178, 178, .4 );
+    left: 15px;       
+}
+
+.sbubble::before {
+    background-color: #F2F2F2;
+    content: "\00a0";
+    display: block;
+    height: 16px;
+    position: absolute;
+    top: 11px;
+    transform:             rotate( 29deg ) skew( -35deg );
+        -moz-transform:    rotate( 29deg ) skew( -35deg );
+        -ms-transform:     rotate( 29deg ) skew( -35deg );
+        -o-transform:      rotate( 29deg ) skew( -35deg );
+        -webkit-transform: rotate( 29deg ) skew( -35deg );
+    width:  20px;
+    box-shadow: -2px 2px 2px 0 rgba( 178, 178, 178, .4 );
+    left: -9px;       
+}
+
+.navicon {
+    color: #1E4E82;
+}
+
+div.complete {
+    text-decoration: line-through;
+    cursor: pointer;
+    display: inline-block;
+    width: 65%;
+}
+
+div.incomplete {
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-block;
+    width: 65%;
+}
+
+div.item-handle {
+    display: inline-block;
+    cursor: move;
+    color: #555555;
+    padding-right: 15px;
+    font-size:16px;
+}
+
+li.complete {
+    background: #efefef;
+}
+
+li.incomplete {
+    background: #ffffff;
+}
+
+div.color-selector {
+    vertical-align: middle;
+    display: inline-block;
+    padding-right: 10px;
+}
+
+div.color-selector-color {
+    vertical-align: middle;
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+    opacity: .7;
+    border: 1px solid #333333;
+    cursor: pointer;
+}
+
+.listItemColor-FF0000 {
+    background: #FF0000;
+}
+
+.listItemColor-00FF00 {
+    background: #00FF00;
+}
+
+.listItemColor-0000FF {
+    background: #0000FF;
+}
+
+
+div.header-icon {
+    font-size: 26pt;
+    font-weight: bold;
+    border: 0px solid black;
+    padding-right:10px;
+}
+
+div.header-text {
+    font-size: 18pt;
+    font-weight: bold;
+    vertical-align: middle;
+    border: 0px solid black;
+}
+
+div.header {
+    margin-top: 15px;
+    margin-bottom: 8px;
+}
+
+.yellow {
+    background: yellow;
+}
