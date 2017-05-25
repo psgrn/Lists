@@ -180,10 +180,10 @@ function initialize() {
                     listItemHtml += "</ul>"
                     listItemHtml += "</div>"
 
-                    
+
 
                     listItemHtml += "<div class='item-handle pull-left'><i class='fa fa-bars' aria-hidden='true'></i></div>"
-                    listItemHtml += "<div id='list-item-text-" + snapshot.key + "' class='" + isCompleteStyle + "'>" + snapshot.val().ListItemName + "</div>"
+                    listItemHtml += "<div id='list-item-text-" + snapshot.key + "' class='" + isCompleteStyle + "'>" + snapshot.val().ListItemName + "(" + snapshot.key + ")</div>"
                     listItemHtml += "<div class='pull-right'>"
                     listItemHtml += "<button id='delete-" + snapshot.key + "' class='btn btn-xs btn-warning'>"
                     listItemHtml += "<span class='glyphicon glyphicon-trash'></span>"
@@ -251,19 +251,21 @@ function initialize() {
                 })
 
                 listItemsRef.on("child_changed", function (snapshot) {
+                    // Check: Completion Status
                     if (snapshot.val().isComplete == true) {
                         $('#list-item-text-' + snapshot.key).removeClass("incomplete")
                         $('#list-item-text-' + snapshot.key).addClass("complete")
                         $('#' + snapshot.key).addClass("complete")
                         $('#' + snapshot.key).removeClass("incomplete")
                     }
-
                     if (snapshot.val().isComplete == false) {
                         $('#list-item-text-' + snapshot.key).removeClass("complete")
                         $('#list-item-text-' + snapshot.key).addClass("incomplete")
                         $('#' + snapshot.key).addClass("incomplete")
                         $('#' + snapshot.key).removeClass("complete")
                     }
+
+                    // Check: Color Code
                     if (snapshot.val().colorCode == "") {
                         $('#btnFlag-' + snapshot.key).css('color', 'black')
                     } else {
@@ -271,6 +273,26 @@ function initialize() {
                     }
                     $('#btnFlag-' + snapshot.key).css('background', snapshot.val().colorCode)
 
+                    // Check: Priority
+                    if (snapshot.val().lastMoved == true) {
+                        // Update data-priority on all list items (not nested ones)
+                        $('#list-page-list-items > li').each(function (i, e) {
+                            ref.child('Lists/' + ListID + '/ListItems/' + $(e).attr('id')).once("value", function (snapshot) {
+                                $(e).attr('data-priority', snapshot.val().priority)
+                            })
+                        })
+
+                        // Shuffle the list with insert and append / maybe a sort would be quicker?
+                        nextPri = snapshot.val().priority + 1
+                        nextID = $('#list-page-list-items').find("[data-priority='" + nextPri + "']").attr('id')
+                        if (typeof nextID !== 'undefined') {
+                            console.log("insert")
+                            $('#' + snapshot.key).insertBefore($('#'+ nextID))
+                        } else {
+                            console.log("append")
+                            $('#' + snapshot.key).appendTo($('#list-page-list-items'))
+                        }
+                    }
                 })
 
                 $("#txtListItemName").keyup(function (event) {
@@ -315,12 +337,18 @@ function initialize() {
                         var updatedPriorityData = {}
                         for (i = 0; i < keysAbove.length; i++) {
                             updatedPriorityData["/" + keysAbove[i] + "/priority"] = i
+                            updatedPriorityData["/" + keysAbove[i] + "/lastMoved"] = false
+                            //$('#' + keysAbove[i]).attr('data-priority', i)
                         }
                         for (i = 0; i < keysBelow.length; i++) {
                             pri = i + newPriority + 1
                             updatedPriorityData["/" + keysBelow[i] + "/priority"] = pri
+                            updatedPriorityData["/" + keysBelow[i] + "/lastMoved"] = false
+                            //$('#' + keysBelow[i]).attr('data-priority', pri)
                         }
                         updatedPriorityData["/" + $('#list-page-list-items > li').eq(ui.item.index()).attr('id') + "/priority"] = newPriority
+                        updatedPriorityData["/" + $('#list-page-list-items > li').eq(ui.item.index()).attr('id') + "/lastMoved"] = true
+                        //$('#' + $('#list-page-list-items > li').eq(ui.item.index()).attr('id')).attr('data-priority', newPriority)
                         ref.child('Lists/' + ListID + '/ListItems').update(updatedPriorityData)
                     },
                 })
@@ -348,6 +376,7 @@ function initialize() {
                 priority: itemPriority,
                 DateTimeUnix: moment(datetime).unix(),
                 isComplete: false,
+                lastMoved: false
             }
             var listItemKey = ref.child('Lists/' + getListID() + '/ListItems').push(data).key;
             $('#txtListItemName').val('')
