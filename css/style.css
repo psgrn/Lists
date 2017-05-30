@@ -1,66 +1,28 @@
-.bubble{
-    background-color: #F2F2F2;
-    border-radius: 5px;
-    box-shadow: 0 0 6px #B2B2B2;
-    padding: 15px 18px;
-    position: relative;
-    vertical-align: top;
-    float: left;   
-    margin: 18px 45px 0px 0px;
-    white-space: pre-wrap;
-}
-
-.bubble::before {
-    background-color: #F2F2F2;
-    content: "\00a0";
-    display: block;
-    height: 16px;
-    position: absolute;
-    top: -6px;
-    transform:             rotate( 119deg ) skew( -35deg );
-        -moz-transform:    rotate( 119deg ) skew( -35deg );
-        -ms-transform:     rotate( 119deg ) skew( -35deg );
-        -o-transform:      rotate( 119deg ) skew( -35deg );
-        -webkit-transform: rotate( 119deg ) skew( -35deg );
-    width:  20px;
-    box-shadow: -2px 2px 2px 0 rgba( 178, 178, 178, .4 );
-    left: 15px;       
-}
-
-.sbubble::before {
-    background-color: #F2F2F2;
-    content: "\00a0";
-    display: block;
-    height: 16px;
-    position: absolute;
-    top: 11px;
-    transform:             rotate( 29deg ) skew( -35deg );
-        -moz-transform:    rotate( 29deg ) skew( -35deg );
-        -ms-transform:     rotate( 29deg ) skew( -35deg );
-        -o-transform:      rotate( 29deg ) skew( -35deg );
-        -webkit-transform: rotate( 29deg ) skew( -35deg );
-    width:  20px;
-    box-shadow: -2px 2px 2px 0 rgba( 178, 178, 178, .4 );
-    left: -9px;       
-}
-
 .navicon {
     color: #1E4E82;
 }
 
-div.complete {
-    text-decoration: line-through;
-    cursor: pointer;
+div.itemtext {
+    width: 55%;
+    padding-top: 1px;
     display: inline-block;
-    width: 65%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    -ms-word-break: break-all;
+    word-break: break-word;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
 }
 
-div.incomplete {
-    text-decoration: none;
-    cursor: pointer;
-    display: inline-block;
-    width: 65%;
-}
+    div.itemtext-complete {
+        text-decoration: line-through;
+    }
+
+    div.itemtext-incomplete {
+        text-decoration: none;
+    }
 
 div.item-handle {
     display: inline-block;
@@ -70,8 +32,28 @@ div.item-handle {
     font-size:16px;
 }
 
+div.checkmark {
+    display: inline-block;
+    padding-right: 12px;
+    font-size:16px;
+}
+
+    div.checkmark-complete {
+        color: #00C415;
+    }
+
+    div.checkmark-incomplete {
+        color: #555555;
+    }
+
+span.itemspan {
+    cursor: pointer;
+}
+
 li.complete {
-    background: #efefef;
+    /*background: #efefef;*/
+    background: rgba(239, 239, 239, .6);
+
 }
 
 li.incomplete {
@@ -95,19 +77,6 @@ div.color-selector-color {
     cursor: pointer;
 }
 
-.listItemColor-FF0000 {
-    background: #FF0000;
-}
-
-.listItemColor-00FF00 {
-    background: #00FF00;
-}
-
-.listItemColor-0000FF {
-    background: #0000FF;
-}
-
-
 div.header-icon {
     font-size: 26pt;
     font-weight: bold;
@@ -125,8 +94,4 @@ div.header-text {
 div.header {
     margin-top: 15px;
     margin-bottom: 8px;
-}
-
-.yellow {
-    background: yellow;
 }
