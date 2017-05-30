@@ -180,10 +180,8 @@ function initialize() {
                     listItemHtml += "</ul>"
                     listItemHtml += "</div>"
 
-
-
                     listItemHtml += "<div class='item-handle pull-left'><i class='fa fa-bars' aria-hidden='true'></i></div>"
-                    listItemHtml += "<div id='list-item-text-" + snapshot.key + "' class='" + isCompleteStyle + "'>" + snapshot.val().ListItemName + "(" + snapshot.key + ")</div>"
+                    listItemHtml += "<div id='list-item-text-" + snapshot.key + "' class='" + isCompleteStyle + "'>" + snapshot.val().ListItemName + "</div>"
                     listItemHtml += "<div class='pull-right'>"
                     listItemHtml += "<button id='delete-" + snapshot.key + "' class='btn btn-xs btn-warning'>"
                     listItemHtml += "<span class='glyphicon glyphicon-trash'></span>"
@@ -193,21 +191,54 @@ function initialize() {
                     listItemsArray.push({})
 
                     if (isInitialDataLoaded) {
-                        $('#list-page-list-items').append(listItemHtml)
+                        $('#list-page-list-items').prepend(listItemHtml)
                     } else {
                         $('#list-page-list-items').append(listItemHtml)
                     }
 
                     $('#list-item-text-' + snapshot.key).on('click', function () {
                         if ($('#list-item-text-' + snapshot.key).hasClass("incomplete")) {
+                            // Mark as complete and move to bottom of the list
                             ref.child('/Lists/' + ListID + '/ListItems/' + snapshot.key).update({ isComplete: true })
+                            var updateData = {}
+                            for (var i = $('#' + snapshot.key).index() + 1; i <= $('#list-page-list-items > li').length - 1; i++) {
+                                if (typeof $('#list-page-list-items > li').eq(i).attr('id') !== typeof undefined && $('#list-page-list-items > li').eq(i).is(":visible")) {
+                                    updateData["/" + $('#list-page-list-items > li').eq(i).attr('id') + "/priority"] = parseInt($('#list-page-list-items > li').eq(i).attr('data-priority')) - 1
+                                }
+                            }
+                            updateData["/" + snapshot.key + "/priority"] = parseInt($('#list-page-list-items > li').last().attr('data-priority'))
+                            ref.child('/Lists/' + ListID + '/ListItems').update(updateData)
                         }
                         else {
+                            // Mark as incomplete and move to top of the list
                             ref.child('/Lists/' + ListID + '/ListItems/' + snapshot.key).update({ isComplete: false })
+                            var updateData = {}
+                            for (var i = 0; i <= $('#' + snapshot.key).index(); i++) {
+                                if (typeof $('#list-page-list-items > li').eq(i).attr('id') !== typeof undefined && $('#list-page-list-items > li').eq(i).is(":visible")) {
+                                    updateData["/" + $('#list-page-list-items > li').eq(i).attr('id') + "/priority"] = parseInt($('#list-page-list-items > li').eq(i).attr('data-priority')) + 1
+                                }
+                            }
+                            updateData["/" + snapshot.key + "/priority"] = parseInt($('#list-page-list-items > li').first().attr('data-priority'))
+                            ref.child('/Lists/' + ListID + '/ListItems').update(updateData)
                         }
                     })
+
+
+
                     $('#delete-' + snapshot.key).on('click', function () {
+                        //get keys below deleted item and decrement their priorities
+                        var updateData = {}
+                        for (var i = $('#' + snapshot.key).index() + 1; i <= $('#list-page-list-items > li').length - 1; i++) {
+                            if (typeof $('#list-page-list-items > li').eq(i).attr('id') !== typeof undefined && $('#list-page-list-items > li').eq(i).is(":visible")) {
+                                updateData["/" + $('#list-page-list-items > li').eq(i).attr('id') + "/priority"] = parseInt($('#list-page-list-items > li').eq(i).attr('data-priority')) - 1
+                                $('#' + $('#list-page-list-items > li').eq(i).attr('id')).attr('data-priority', parseInt($('#list-page-list-items > li').eq(i).attr('data-priority')) - 1)
+                            }
+                        }
+                        ref.child('/Lists/' + ListID + '/ListItems').update(updateData)
+                        // delete the item
                         ref.child('Lists/' + getListID() + '/ListItems/' + snapshot.key).remove()
+
+
                     })
 
                     var colorUpdate = {}
@@ -240,14 +271,15 @@ function initialize() {
                         colorUpdate["/" + snapshot.key + "/colorCode"] = "#a600d1"
                         ref.child('Lists/' + ListID + '/ListItems').update(colorUpdate)
                     })
-                })
+                });
 
                 listItemsRef.once("value", function (snapshot) {
                     isInitialDataLoaded = true;
                 })
 
                 listItemsRef.on("child_removed", function (snapshot) {
-                    $('#' + snapshot.key + '').fadeOut(0);
+                    // Use to have a fade-out, but this just hid the div, and made sorting and other index functions a problem
+                    $('#' + snapshot.key + '').remove(0);
                 })
 
                 listItemsRef.on("child_changed", function (snapshot) {
@@ -274,6 +306,25 @@ function initialize() {
                     $('#btnFlag-' + snapshot.key).css('background', snapshot.val().colorCode)
 
                     // Check: Priority
+                    ref.child('Lists/' + getListID() + '/ListItems').orderByChild('priority').once("value", function (snapshot) {
+                        var i = 0
+                        var diff = false
+                        snapshot.forEach(function (childsnapshot) {
+                            if ($('#list-page-list-items > li').eq(i).attr('id') != childsnapshot.key) {
+                                $('#' + childsnapshot.key).attr('data-priority', childsnapshot.val().priority)
+                                diff = true
+                            }
+                            i += 1
+                        })
+                        if (diff == true) {
+                            var $wrapper = $('#list-page-list-items');
+                            $wrapper.find('.list-group-item').sort(function (a, b) {
+                                return a.dataset.priority - b.dataset.priority;
+                            }).appendTo($wrapper);
+                        }
+                    })
+
+                    /*
                     if (snapshot.val().lastMoved == true) {
                         // Update data-priority on all list items (not nested ones)
                         $('#list-page-list-items > li').each(function (i, e) {
@@ -286,13 +337,12 @@ function initialize() {
                         nextPri = snapshot.val().priority + 1
                         nextID = $('#list-page-list-items').find("[data-priority='" + nextPri + "']").attr('id')
                         if (typeof nextID !== 'undefined') {
-                            console.log("insert")
-                            $('#' + snapshot.key).insertBefore($('#'+ nextID))
+                            $('#' + snapshot.key).insertBefore($('#' + nextID))
                         } else {
-                            console.log("append")
                             $('#' + snapshot.key).appendTo($('#list-page-list-items'))
                         }
                     }
+                    */
                 })
 
                 $("#txtListItemName").keyup(function (event) {
@@ -337,16 +387,18 @@ function initialize() {
                         var updatedPriorityData = {}
                         for (i = 0; i < keysAbove.length; i++) {
                             updatedPriorityData["/" + keysAbove[i] + "/priority"] = i
+                            $('#' + keysAbove[i]).attr('data-priority', i)
                             updatedPriorityData["/" + keysAbove[i] + "/lastMoved"] = false
-                            //$('#' + keysAbove[i]).attr('data-priority', i)
                         }
                         for (i = 0; i < keysBelow.length; i++) {
                             pri = i + newPriority + 1
                             updatedPriorityData["/" + keysBelow[i] + "/priority"] = pri
+                            $('#' + keysBelow[i]).attr('data-priority', pri)
                             updatedPriorityData["/" + keysBelow[i] + "/lastMoved"] = false
-                            //$('#' + keysBelow[i]).attr('data-priority', pri)
+                            
                         }
                         updatedPriorityData["/" + $('#list-page-list-items > li').eq(ui.item.index()).attr('id') + "/priority"] = newPriority
+                        $('#' + $('#list-page-list-items > li').eq(ui.item.index()).attr('id')).attr('priority', i)
                         updatedPriorityData["/" + $('#list-page-list-items > li').eq(ui.item.index()).attr('id') + "/lastMoved"] = true
                         //$('#' + $('#list-page-list-items > li').eq(ui.item.index()).attr('id')).attr('data-priority', newPriority)
                         ref.child('Lists/' + ListID + '/ListItems').update(updatedPriorityData)
@@ -363,22 +415,25 @@ function initialize() {
             $("#txtListItemName").focus()
         } else {
             $("#list-page-input-group").removeClass("has-error")
-            var itemPriority = 0
-            ref.child('Lists/' + getListID() + '/ListItems').orderByChild('priority').limitToLast(1).once("value", function (snapshot) {
-                snapshot.forEach(function (childsnapshot) {
-                    itemPriority = childsnapshot.val().priority + 1
-                })
+            // Increment priority of all pre-existing items by 1
+            var updateData = {}
+            $('#list-page-list-items > li').each(function (i, e) {
+                updateData["/" + $(e).attr('id') + "/priority"] = parseInt($(e).attr('data-priority')) + 1
+                $('#' + $(e).attr('id')).attr('data-priority', parseInt($(e).attr('data-priority')) + 1)
             })
+            ref.child('Lists/' + getListID() + '/ListItems').update(updateData)
+
+            // Add new item with priority 0
             var datetime = moment().format()
             var data = {
                 ListItemName: document.getElementById('txtListItemName').value,
                 colorCode: "",
-                priority: itemPriority,
+                priority: 0,
                 DateTimeUnix: moment(datetime).unix(),
                 isComplete: false,
                 lastMoved: false
             }
-            var listItemKey = ref.child('Lists/' + getListID() + '/ListItems').push(data).key;
+            ref.child('Lists/' + getListID() + '/ListItems').push(data).key;
             $('#txtListItemName').val('')
             $('#txtListItemName').focus()
         }
