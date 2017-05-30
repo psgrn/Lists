@@ -3,8 +3,7 @@
 }
 
 div.itemtext {
-    width: 55%;
-    padding-top: 1px;
+    cursor: pointer;
     display: inline-block;
     overflow-wrap: break-word;
     word-wrap: break-word;
@@ -15,7 +14,6 @@ div.itemtext {
     -webkit-hyphens: auto;
     hyphens: auto;
 }
-
     div.itemtext-complete {
         text-decoration: line-through;
     }
@@ -25,19 +23,16 @@ div.itemtext {
     }
 
 div.item-handle {
-    display: inline-block;
     cursor: move;
     color: #555555;
-    padding-right: 15px;
     font-size:16px;
 }
 
 div.checkmark {
+    cursor: pointer;
     display: inline-block;
-    padding-right: 12px;
     font-size:16px;
 }
-
     div.checkmark-complete {
         color: #00C415;
     }
@@ -46,24 +41,12 @@ div.checkmark {
         color: #555555;
     }
 
-span.itemspan {
-    cursor: pointer;
-}
-
 li.complete {
-    /*background: #efefef;*/
     background: rgba(239, 239, 239, .6);
-
 }
 
 li.incomplete {
     background: #ffffff;
-}
-
-div.color-selector {
-    vertical-align: middle;
-    display: inline-block;
-    padding-right: 10px;
 }
 
 div.color-selector-color {
@@ -94,4 +77,26 @@ div.header-text {
 div.header {
     margin-top: 15px;
     margin-bottom: 8px;
+}
+
+div.flex-main-parent {
+    display: flex;
+    align-items: top;
+}
+
+div.flex-left {
+    display: flex;
+    width: 80px;
+    justify-content: space-between;
+    flex-shrink: 0;
+    margin-right: 15px;
+}
+
+div.flex-center {
+    margin-right: 15px;
+    padding-top: 2px;
+}
+
+div.flex-right {
+    margin-left: auto;
 }

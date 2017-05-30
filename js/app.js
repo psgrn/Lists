@@ -167,27 +167,32 @@ function initialize() {
 
                     listItemHtml = "<li class='list-group-item clearfix " + isCompleteStyle + "' id='" + snapshot.key + "' data-priority='" + snapshot.val().priority + "'>"
 
-                    listItemHtml += "<div class='dropdown pull-left' style='display:inline-block;'>"
-                    listItemHtml += "<button id='btnFlag-" + snapshot.key + "' class='btn btn-xs btn-default dropdown-toggle' data-toggle='dropdown' style='margin-right:8px;background: " + snapshot.val().colorCode + "; color: " + colorCodeForeColor + "; opacity: 0.6;'><span class='glyphicon glyphicon-flag'></span></button>&nbsp;"
-                    listItemHtml += "<ul class='dropdown-menu pull-left'>"
-                    listItemHtml += "<li id='itemcolor-none-" + snapshot.key + "'><a style='cursor: pointer;'><div class='color-selector-color' style='background: white';></div>None</a></li>"
-                    listItemHtml += "<li id='itemcolor-blue-" + snapshot.key + "'><a style='cursor: pointer;'><div class='color-selector-color' style='background: #0000FF';></div> Blue</a></li>"
-                    listItemHtml += "<li id='itemcolor-green-" + snapshot.key + "'><a style='cursor: pointer;'><div class='color-selector-color' style='background: #00C415';></div> Green</a></li>"
-                    listItemHtml += "<li id='itemcolor-orange-" + snapshot.key + "'><a style='cursor: pointer;'><div class='color-selector-color' style='background: #ff8800';></div> Orange</a></li>"
-                    listItemHtml += "<li id='itemcolor-purple-" + snapshot.key + "'><a style='cursor: pointer;'><div class='color-selector-color' style='background: #a600d1';></div> Purple</a></li>"
-                    listItemHtml += "<li id='itemcolor-red-" + snapshot.key + "'><a style='cursor: pointer;'><div class='color-selector-color' style='background: #FF0000';></div>Red</a></li>"
-                    listItemHtml += "</ul>"
-                    listItemHtml += "</div>"
+                    listItemHtml += "<div class='flex-main-parent'>"
+                        listItemHtml += "<div class='flex-left'>"
+                            listItemHtml += "<div>"
+                                listItemHtml += "<button id='btnFlag-" + snapshot.key + "' class='btn btn-xs btn-default dropdown-toggle' data-toggle='dropdown' style='background: " + snapshot.val().colorCode + "; color: " + colorCodeForeColor + "; opacity: 0.6;'><span class='glyphicon glyphicon-flag'></span></button>"
+                                listItemHtml += "<ul class='dropdown-menu'>"
+                                listItemHtml += "<li id='itemcolor-none-" + snapshot.key + "'><a style='cursor: pointer;'><div class='color-selector-color' style='background: white';></div>None</a></li>"
+                                listItemHtml += "<li id='itemcolor-blue-" + snapshot.key + "'><a style='cursor: pointer;'><div class='color-selector-color' style='background: #0000FF';></div> Blue</a></li>"
+                                listItemHtml += "<li id='itemcolor-green-" + snapshot.key + "'><a style='cursor: pointer;'><div class='color-selector-color' style='background: #00C415';></div> Green</a></li>"
+                                listItemHtml += "<li id='itemcolor-orange-" + snapshot.key + "'><a style='cursor: pointer;'><div class='color-selector-color' style='background: #ff8800';></div> Orange</a></li>"
+                                listItemHtml += "<li id='itemcolor-purple-" + snapshot.key + "'><a style='cursor: pointer;'><div class='color-selector-color' style='background: #a600d1';></div> Purple</a></li>"
+                                listItemHtml += "<li id='itemcolor-red-" + snapshot.key + "'><a style='cursor: pointer;'><div class='color-selector-color' style='background: #FF0000';></div>Red</a></li>"
+                                listItemHtml += "</ul>"
+                            listItemHtml += "</div>"
+                            listItemHtml += "<div class='item-handle'><i class='fa fa-bars' aria-hidden='true'></i></div>"
+                            listItemHtml += "<div class='checkmark checkmark-" + isCompleteStyle + " ' id='checkmark-" + snapshot.key + "'><i class='fa fa-check-circle' aria-hidden='true'></i></div>"
+                        listItemHtml += "</div>"
 
-                    listItemHtml += "<div class='item-handle pull-left'><i class='fa fa-bars' aria-hidden='true'></i></div>"
-                    listItemHtml += "<span class='itemspan' id='itemspan-" + snapshot.key + "'>"
-                    listItemHtml += "<div class='checkmark checkmark-" + isCompleteStyle + " pull-left' id='checkmark-" + snapshot.key + "'><i class='fa fa-check-circle' aria-hidden='true'></i></div>"
-                    listItemHtml += "<div id='list-item-text-" + snapshot.key + "' class='itemtext itemtext-" + isCompleteStyle + "'>" + snapshot.val().ListItemName + "</div>"
-                    listItemHtml += "</span>"
-                    listItemHtml += "<div class='pull-right'>"
-                    listItemHtml += "<button id='delete-" + snapshot.key + "' class='btn btn-xs btn-warning'>"
-                    listItemHtml += "<span class='glyphicon glyphicon-trash'></span>"
-                    listItemHtml += "</button></div>"
+                        listItemHtml += "<div id='itemtext-" + snapshot.key + "' class='flex-center itemtext itemtext-" + isCompleteStyle + "'>" + snapshot.val().ListItemName + "</div>"
+                        
+                        listItemHtml += "<div class='flex-right'>"
+                            listItemHtml += "<button id='delete-" + snapshot.key + "' class='btn btn-xs btn-warning'>"
+                            listItemHtml += "<span class='glyphicon glyphicon-trash'></span>"
+                        listItemHtml += "</button></div>"
+                    listItemHtml += "</div>"
+                    
+                    
                     listItemHtml += "</li>"
 
                     if (isInitialDataLoaded) {
@@ -196,8 +201,8 @@ function initialize() {
                         $('#list-page-list-items').append(listItemHtml)
                     }
 
-                    $('#itemspan-' + snapshot.key).on('click', function () {
-                        if ($('#list-item-text-' + snapshot.key).hasClass("itemtext-incomplete")) {
+                    $('#itemtext-' + snapshot.key + ', #checkmark-' + snapshot.key).click(function () {
+                        if ($('#itemtext-' + snapshot.key).hasClass("itemtext-incomplete")) {
                             // Mark as complete and move to bottom of the list
                             ref.child('/Lists/' + ListID + '/ListItems/' + snapshot.key).update({ isComplete: true })
                             var updateData = {}
@@ -281,16 +286,16 @@ function initialize() {
                 listItemsRef.on("child_changed", function (snapshot) {
                     // Check: Completion Status
                     if (snapshot.val().isComplete == true) {
-                        $('#list-item-text-' + snapshot.key).removeClass("itemtext-incomplete")
-                        $('#list-item-text-' + snapshot.key).addClass("itemtext-complete")
+                        $('#itemtext-' + snapshot.key).removeClass("itemtext-incomplete")
+                        $('#itemtext-' + snapshot.key).addClass("itemtext-complete")
                         $('#checkmark-' + snapshot.key).removeClass("checkmark-incomplete")
                         $('#checkmark-' + snapshot.key).addClass("checkmark-complete")
                         $('#' + snapshot.key).addClass("complete")
                         $('#' + snapshot.key).removeClass("incomplete")
                     }
                     if (snapshot.val().isComplete == false) {
-                        $('#list-item-text-' + snapshot.key).removeClass("itemtext-complete")
-                        $('#list-item-text-' + snapshot.key).addClass("itemtext-incomplete")
+                        $('#itemtext-' + snapshot.key).removeClass("itemtext-complete")
+                        $('#itemtext-' + snapshot.key).addClass("itemtext-incomplete")
                         $('#checkmark-' + snapshot.key).removeClass("checkmark-complete")
                         $('#checkmark-' + snapshot.key).addClass("checkmark-incomplete")
                         $('#' + snapshot.key).addClass("incomplete")
